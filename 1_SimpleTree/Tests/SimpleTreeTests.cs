@@ -619,5 +619,33 @@ namespace Tests
 
             AssetNodeLevel(tree.GetAllNodes(), 4, new List<(int, int)> { (5, 1), (6, 2), (7, 2), (8, 3) });
         }
+
+        [Test]
+        public void IsSymmetric()
+        {
+            var root = new SimpleTreeNode<int>(1, null);
+            var tree = new SimpleTree<int>(root);
+
+            var leftNode = new SimpleTreeNode<int>(2, tree.Root);
+            var rightNode = new SimpleTreeNode<int>(2, tree.Root);
+            tree.AddChild(tree.Root, leftNode);
+            tree.AddChild(tree.Root, rightNode);
+
+            Assert.IsTrue(tree.IsSymmetric());
+
+            var leftNodeLeftSubNode = new SimpleTreeNode<int>(3, leftNode);
+            var leftNodeRightSubNode = new SimpleTreeNode<int>(4, leftNode);
+            tree.AddChild(leftNode, leftNodeLeftSubNode);
+            tree.AddChild(leftNode, leftNodeRightSubNode);
+
+            Assert.IsFalse(tree.IsSymmetric());
+
+            var rightNodeLeftSubNode = new SimpleTreeNode<int>(4, rightNode);
+            var rightNodeRightSubNode = new SimpleTreeNode<int>(3, rightNode);
+            tree.AddChild(rightNode, rightNodeLeftSubNode);
+            tree.AddChild(rightNode, rightNodeRightSubNode);
+
+            Assert.IsTrue(tree.IsSymmetric());
+        }
     }
 }

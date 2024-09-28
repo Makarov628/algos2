@@ -82,6 +82,32 @@ namespace AlgorithmsDataStructures2
 
     public int LeafCount() => GetAllNodes().Count(node => node.IsLeaf());
 
+    public bool IsSymmetric()
+    {
+      if (Root == null || Root.IsLeaf())
+        return true;
+
+      if (Root.Children.Count != 2)
+        return false;
+
+      return IsNodeSymmetric(Root.Children[0], Root.Children[1]);
+    }
+
+    private bool IsNodeSymmetric(SimpleTreeNode<T> leftNode, SimpleTreeNode<T> rightNode)
+    {
+      if (!leftNode.NodeValue.Equals(rightNode.NodeValue))
+        return false;
+
+      if (leftNode.IsLeaf() && rightNode.IsLeaf())
+        return true;
+
+      if (leftNode.Children?.Count != 2 || rightNode.Children?.Count != 2)
+        return false; 
+
+      return IsNodeSymmetric(leftNode.Children[0], rightNode.Children[1]) 
+          && IsNodeSymmetric(leftNode.Children[1], rightNode.Children[0]);
+    }
+
     private List<SimpleTreeNode<T>> GetNodes(SimpleTreeNode<T> node)
     {
       List<SimpleTreeNode<T>> nodes = new() { node };
