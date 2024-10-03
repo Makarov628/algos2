@@ -23,6 +23,34 @@ namespace AlgorithmsDataStructures2
       LeftChild = null;
       RightChild = null;
     }
+
+    public BSTNode(int key, T val) : this(key, val, null)
+    { }
+
+    public void AddLeft(BSTNode<T> node)
+    {
+      if (node == null)
+        return;
+
+      LeftChild = node;
+      node.Parent = this;
+    }
+
+    public void AddRight(BSTNode<T> node)
+    {
+      if (node == null)
+        return;
+
+      RightChild = node;
+      node.Parent = this;
+    }
+
+    public bool IsHasLeft() => LeftChild != null;
+
+    public bool IsHasRight() => RightChild != null;
+
+    public bool IsLeaf() => !(IsHasLeft() && IsHasRight());
+
   }
 
   // промежуточный результат поиска
@@ -60,7 +88,7 @@ namespace AlgorithmsDataStructures2
 
       if (node.Node == null)
       {
-        Root = new BSTNode<T>(key, val, null);
+        Root = new BSTNode<T>(key, val);
         return true;
       }
 
@@ -113,7 +141,7 @@ namespace AlgorithmsDataStructures2
 
       // Если мы находим лист, то его и надо поместить вместо удаляемого узла.
       // делаем узел-приемник потомком родителя удаляемого узла
-      if (nodeToChange.LeftChild == null && nodeToChange.RightChild == null)
+      if (nodeToChange.IsLeaf())
       {
         if (leftChild != null && !nodeToChange.Equals(leftChild))
           leftChild.Parent = nodeToChange;
@@ -148,10 +176,10 @@ namespace AlgorithmsDataStructures2
 
     private BSTNode<T> GetNodeToChange(BSTNode<T> node)
     {
-      if (node.RightChild == null && node.LeftChild == null)
+      if (node.IsLeaf())
         return null;
 
-      if (node.RightChild == null)
+      if (!node.IsHasRight())
         return FinMinMax(node.LeftChild, true);
 
       return FinMinMax(node.RightChild, false);
@@ -161,10 +189,10 @@ namespace AlgorithmsDataStructures2
     {
       var list = new List<BSTNode<T>> { currentNode };
 
-      if (currentNode.LeftChild != null)
+      if (currentNode.IsHasLeft())
         list.AddRange(GetAllNodes(currentNode.LeftChild));
 
-      if (currentNode.RightChild != null)
+      if (currentNode.IsHasRight())
         list.AddRange(GetAllNodes(currentNode.RightChild));
 
       return list;
@@ -203,10 +231,10 @@ namespace AlgorithmsDataStructures2
 
     public BSTNode<T> GetMinMax(BSTNode<T> currentNode, bool findMax)
     {
-      if (currentNode.RightChild == null && findMax)
+      if (!currentNode.IsHasRight() && findMax)
         return currentNode;
 
-      if (currentNode.LeftChild == null && !findMax)
+      if (!currentNode.IsHasLeft() && !findMax)
         return currentNode;
 
       if (findMax)
@@ -237,9 +265,9 @@ namespace AlgorithmsDataStructures2
 
         allNodes.Add(currentT);
 
-        if (currentT.LeftChild != null)
+        if (currentT.IsHasLeft())
           queue.Enqueue(currentT.LeftChild);
-        if (currentT.RightChild != null)
+        if (currentT.IsHasRight())
           queue.Enqueue(currentT.RightChild);
       }
 
@@ -267,12 +295,12 @@ namespace AlgorithmsDataStructures2
     {
       var nodes = new List<BSTNode>();
 
-      if (current.LeftChild != null)
+      if (current.IsHasLeft())
         nodes.AddRange(InOrder(current.LeftChild));
 
       nodes.Add(current);
 
-      if (current.RightChild != null)
+      if (current.IsHasRight())
         nodes.AddRange(InOrder(current.RightChild));
 
       return nodes;
@@ -282,10 +310,10 @@ namespace AlgorithmsDataStructures2
     {
       var nodes = new List<BSTNode>();
 
-      if (current.LeftChild != null)
+      if (current.IsHasLeft())
         nodes.AddRange(PostOrder(current.LeftChild));
 
-      if (current.RightChild != null)
+      if (current.IsHasRight())
         nodes.AddRange(PostOrder(current.RightChild));
 
       nodes.Add(current);
@@ -298,10 +326,10 @@ namespace AlgorithmsDataStructures2
       var nodes = new List<BSTNode>();
       nodes.Add(current);
 
-      if (current.LeftChild != null)
+      if (current.IsHasLeft())
         nodes.AddRange(PreOrder(current.LeftChild));
 
-      if (current.RightChild != null)
+      if (current.IsHasRight())
         nodes.AddRange(PreOrder(current.RightChild));
 
       return nodes;
