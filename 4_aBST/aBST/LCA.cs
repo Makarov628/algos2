@@ -1,184 +1,98 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AlgorithmsDataStructures2
 {
-  public class LCA
+  public static class LCA
   {
-    // public int MaxDepth;
-    // public int?[] Tree; // массив ключей
+    public static int? LowestCommonAncestor(this aBST bst, int firstIndex, int secondIndex)
+    {
+      if (firstIndex < 0 && secondIndex < 0)
+        return null;
 
-    // public LCA(int depth)
-    // {
-    //   MaxDepth = depth;
-    //   int tree_size = (int)Math.Pow(2, depth + 1) - 1;
-    //   Tree = new int?[tree_size];
-    //   for (int i = 0; i < tree_size; i++) Tree[i] = null;
-    // }
+      if (firstIndex >= bst.Tree.Length && secondIndex >= bst.Tree.Length)
+        return null;
 
-    // public int? FindKeyIndex(int key)
-    // {
-    //   return FindKeyIndex(key, 0);
-    // }
+      // Если один ключ не найден, тогда считаем предком другой
+      if (firstIndex < 0 || secondIndex < 0)
+        return Math.Max(firstIndex, secondIndex);
 
-    // private int? FindKeyIndex(int key, int index)
-    // {
-    //   if (index >= Tree.Length)
-    //     return null;
+      if (firstIndex >= bst.Tree.Length || secondIndex >= bst.Tree.Length)
+        return Math.Min(firstIndex, secondIndex);
 
-    //   if (Tree[index] == null)
-    //     return -index;
+      // Если индексы одинаковы, возвращаем найденный ключ
+      if (firstIndex == secondIndex)
+        return firstIndex;
 
-    //   if (Tree[index] == key)
-    //     return index;
+      return LowestCommonAncestor(firstIndex, secondIndex);
+    }
 
-    //   if (Tree[index] < key)
-    //     return FindKeyIndex(key, 2 * index + 1);
+    private static int CountOfBinaryDigits(int index) =>
+      (int)Math.Floor(Math.Log2(index));
 
-    //   return FindKeyIndex(key, 2 * index + 2);
-    // }
+    private static int LowestCommonAncestor(int firstIndex, int secondIndex)
+    {
+      var minNode = Math.Min(firstIndex, secondIndex) + 1;
+      var maxNode = Math.Max(firstIndex, secondIndex) + 1;
 
-    // public int AddKey(int key)
-    // {
-    //   int? index = FindKeyIndex(key, 0);
+      // Считаем на какой глубине находятся индексы
+      var depthOfMin = CountOfBinaryDigits(minNode);
+      var depthOfMax = CountOfBinaryDigits(maxNode);
 
-    //   if (index == null)
-    //     return -1;
+      // С помощью побитового сдвига поднимаемся на глубину минимального индекса и получаем родителя
+      var parentNode = maxNode >> (depthOfMax - depthOfMin);
 
-    //   if (index > 0)
-    //     return index.Value;
+      // Если найденный родитель равен минимальному индексу, значит он является предком
+      if (parentNode == minNode)
+        return parentNode - 1;
 
-    //   int positiveIndex = Math.Abs(index.Value);
-    //   Tree[positiveIndex] = key;
-    //   return positiveIndex;
-    // }
-
-    // public (int firstIndex, int secondIndex) FindIndexes(int firstKey, int secondKey)
-    // {
-    //   // TODO:
-    //   return (firstKey, secondKey);
-    // }
-
-    // public int FindDepthForIndex(int index) =>
-    //   (int)Math.Floor(Math.Log2(index + 1));
-
-    // public int GetSideOfMainSubtree(int index)
-    // {
-    //   // Ищем на какой глубине находится индекс
-    //   var depth = FindDepthForIndex(index);
-
-    //   // Определяем начальный и конечный индексы на полученной глубине
-    //   var firstIndexOfLeftSubtree = Math.Pow(2, depth) / 2;
-    //   var lastIndexOfRightSubtree = Math.Pow(2, depth) - 1;
-
-    //   // Определяем границы главного левого поддерева
-    //   var lastIndexOfLeftSubtree = lastIndexOfRightSubtree - firstIndexOfLeftSubtree / 2;
-    //   if (firstIndexOfLeftSubtree <= index || index <= lastIndexOfLeftSubtree)
-    //     return 1; // Индекс левого поддерева
-
-    //   // Определяем границы главного правого поддерева
-    //   var firstIndexOfRightSubtree = lastIndexOfLeftSubtree + 1;
-    //   if (firstIndexOfRightSubtree <= index || index <= lastIndexOfRightSubtree)
-    //     return 2; // Индекс правого поддерева
-
-    //   return 0;
-    // }
-
-
-
-    // public (int leftBorderIndex, int rightBorderIndex) FindBordersOfSubtree(int index, int depth)
-    // {
-    //   // Определяем начальный и конечный индексы на полученной глубине
-    //   var LeftSubtreeLeftBorder = Math.Pow(2, depth) / 2;
-    //   var RightSubtreeRightBorder = Math.Pow(2, depth) - 1;
-
-    //   // Определяем границы главного левого поддерева
-    //   var LeftSubtreeRightBorder = RightSubtreeRightBorder - LeftSubtreeLeftBorder / 2;
-
-    //   // Определяем границы главного правого поддерева
-    //   var RightSubtreeLeftBorder = LeftSubtreeRightBorder + 1;
-
-    //   return ()
-    // }
-
-    // public bool TryFindAncestorFromTwoIndexes(int firstIndex, int secondIndex, out int ancestorIndex)
-    // {
-    //   ancestorIndex = -1;
-
-    //   var minIndex = Math.Min(firstIndex, secondIndex);
-    //   var maxIndex = Math.Max(firstIndex, secondIndex);
-
-    //   var depthOfMinIndex = FindDepthForIndex(minIndex);
-    //   var depthOfMaxIndex = FindDepthForIndex(maxIndex);
-
-    //   if (depthOfMinIndex == depthOfMaxIndex)
-    //     return false;
-
-
-
-    //   return true;
-    // }
-
-    // public int? LCA2(int firstKey, int secondKey)
-    // {
-    //   var (firstIndex, secondIndex) = FindIndexes(firstKey, secondKey);
-    //   if (firstIndex == -1 && secondIndex == -1)
-    //     return null;
-
-    //   // Если один ключ не найден, тогда считаем предком другой
-    //   if (firstIndex == -1 || secondIndex == -1)
-    //     return Tree[Math.Max(firstIndex, secondIndex)];
-
-    //   // Если индексы одинаковы, возвращаем найденный ключ
-    //   if (firstIndex == secondIndex)
-    //     return Tree[firstIndex];
-
-    //   var minIndex = Math.Min(firstIndex, secondIndex); // 3  // 3
-    //   var maxIndex = Math.Max(firstIndex, secondIndex); // 10 // 5
-    //   var depthOfMinIndex = FindDepthForIndex(minIndex); // 2 // 2
-    //   var depthOfMaxIndex = FindDepthForIndex(maxIndex); // 3 // 2
-
-    //   if (depthOfMinIndex == depthOfMaxIndex)
-    //   {
-
-    //   }
+      // Подсчитываем расстояние до предка
+      var distance = CountOfBinaryDigits(parentNode ^ minNode);
       
+      // Сдвигаем и возращаем индекс
+      return (parentNode >> distance) - 1;
+    }
 
-      
+    public static bool DeleteSubtree(this aBST bst, int key)
+    {
+      var rootIndex = bst.FindKeyIndex(key) ?? -1;
+      if (rootIndex == -1)
+        return false;
 
-    // }
+      var rootNumber = rootIndex + 1;
 
-    // public int? LCA(int firstKey, int secondKey)
-    // {
-    //   var (firstIndex, secondIndex) = FindIndexes(firstKey, secondKey);
-    //   if (firstIndex == -1 && secondIndex == -1)
-    //     return null;
+      // Считаем на какой глубине находится индекс относительно всего дерева
+      var depthOfIndex = (int)Math.Floor(Math.Log2(rootNumber));
 
-    //   // Если один ключ не найден, тогда считаем предком второй
-    //   if (firstIndex == -1 || secondIndex == -1)
-    //     return Tree[Math.Max(firstIndex, secondIndex)];
+      // Глубина всего дерева
+      var maxDepth = (int)Math.Floor(Math.Log2(bst.Tree.Length));
 
-    //   // Если индексы одинаковы, возвращаем найденный ключ
-    //   if (firstIndex == secondIndex)
-    //     return Tree[firstIndex];
+      // Определяем глубину поддерева 
+      var subtreeDepth = maxDepth - depthOfIndex;
 
-    //   // Ищем в каком из главных поддеревьев находятся индексы
-    //   var firstIndexDepth = FindDepthForIndex(firstIndex);
-    //   var secondIndexDepth = FindDepthForIndex(secondIndex);
+      // Выделяем границы на максимальной глубине поддерева
+      var leftBorder = rootNumber << subtreeDepth;
+      var rightBorder = leftBorder + (int)Math.Pow(2, subtreeDepth) - 1;
 
-    //   // Если индексы в разных главных поддеревьях то общим предком будет корень
-    //   if (GetSideOfMainSubtree(firstIndex) != GetSideOfMainSubtree(secondIndex))
-    //     return Tree.FirstOrDefault();
+      // Удаляем элементы и двигаемся к корню поддерева побитовым сдвигом
+      while (leftBorder != rootNumber && rightBorder != rootNumber)
+      {
+        for (int i = leftBorder - 1; i < rightBorder; i++)
+          bst.Tree[i] = null;
 
-    //   // Проверяем не являются ли индексы предками друг другу
-    //   if (TryFindAncestorFromTwoIndexes(firstIndex, secondIndex, out var ancestorIndex))
-    //     return Tree[ancestorIndex];
+        leftBorder >>= 1;
+        rightBorder >>= 1;
+      }
 
+      bst.Tree[rootIndex] = null;
+      return true;
+    }
 
-
-    //   return null;
-    // }
+    public static List<int> WideAllNodes(this aBST aBST) => 
+      aBST.Tree.Where(node => node.HasValue).Select(node => (int)node).ToList();
 
   }
 }
