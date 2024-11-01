@@ -34,7 +34,6 @@ namespace AlgorithmsDataStructures2
       if (a == null || a.Length == 0)
         return;
 
-      // создаём дерево с нуля из неотсортированного массива a
       Array.Sort(a);
       Root = Generate(Root, a, 0, a.Length - 1, 0);
     }
@@ -47,10 +46,24 @@ namespace AlgorithmsDataStructures2
       var leftDepth = GetDepth(root_node.LeftChild, root_node);
       var rightDepth = GetDepth(root_node.RightChild, root_node);
 
-      // сбалансировано ли дерево с корнем root_node
       return Math.Abs(leftDepth - rightDepth) <= 1
              && IsBalanced(root_node.LeftChild)
              && IsBalanced(root_node.RightChild);
+    }
+
+    public bool IsValid() => 
+      ValidateTree(Root, int.MinValue, int.MaxValue);
+
+    public bool ValidateTree(BSTNode node, int minKey, int maxKey)
+    {
+      if (node == null)
+        return true;
+
+      if (node.NodeKey < minKey || node.NodeKey >= maxKey)
+        return false;
+
+      return ValidateTree(node.LeftChild, minKey, node.NodeKey) 
+          && ValidateTree(node.RightChild, node.NodeKey, maxKey);
     }
 
     public List<BSTNode> GetNodes()

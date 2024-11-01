@@ -105,5 +105,70 @@ namespace Tests
 
             Assert.IsTrue(tree.IsBalanced(root));
         }
+
+        [Test]
+        public void Valid()
+        {
+            BalancedBST tree = new BalancedBST();
+            var root = new BSTNode(7, null);
+            tree.Root = root;
+            var child3 = new BSTNode(3, root)
+            {
+                Level = 1
+            };
+
+            var child11 = new BSTNode(11, root)
+            {
+                Level = 1
+            };
+            var child9 = new BSTNode(9, child11)
+            {
+                Level = 2
+            };
+            var child13 = new BSTNode(13, child11)
+            {
+                Level = 2
+            };
+
+            root.LeftChild = child3;
+            root.RightChild = child11;
+            
+            child11.LeftChild = child9;
+            child11.RightChild = child13;
+
+            Assert.IsTrue(tree.IsValid());
+        }
+
+        [Test]
+        public void NotValid()
+        {
+                        BalancedBST tree = new BalancedBST();
+            var root = new BSTNode(7, null);
+            tree.Root = root;
+            var child3 = new BSTNode(3, root)
+            {
+                Level = 1
+            };
+            var child11 = new BSTNode(11, root)
+            {
+                Level = 1
+            };
+            var child9 = new BSTNode(9, child11)
+            {
+                Level = 2
+            };
+            var child13 = new BSTNode(13, child11)
+            {
+                Level = 2
+            };
+
+            root.LeftChild = child3;
+            root.RightChild = child11;
+
+            child11.LeftChild = child13;
+            child11.RightChild = child9;
+
+            Assert.IsFalse(tree.IsValid());
+        }
     }
 }
