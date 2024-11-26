@@ -64,7 +64,7 @@ namespace AlgorithmsDataStructures2
         public static int FindElementLessThanKey(this Heap heap, int key)
         {
             if (heap.HeapArray == null || heap.HeapArray.Length == 0 || heap.lastPointer == 0)
-                return -1; 
+                return -1;
 
             var clonedHeap = new Heap()
             {
@@ -72,40 +72,37 @@ namespace AlgorithmsDataStructures2
                 lastPointer = heap.lastPointer
             };
             Array.Copy(heap.HeapArray, clonedHeap.HeapArray, heap.lastPointer);
-            
+
             while (clonedHeap.lastPointer > 0)
             {
                 var element = clonedHeap.GetMax();
                 if (element < key)
                     return element;
             }
-                
+
             return -1;
         }
 
-        public static Heap MergeHeaps(Heap first, Heap second)
+    
+        public static Heap MergeHeaps(params Heap[] heaps)
         {
-            int totalCount = first.lastPointer + second.lastPointer;
-            int depth = (int)Math.Floor(Math.Log2(totalCount));
+            int elementsTotalCount = heaps.Sum(heap => heap.lastPointer);
+            int newHeapDepth = (int)Math.Floor(Math.Log2(elementsTotalCount));
 
             var newHeap = new Heap();
-            newHeap.MakeHeap(new int[0], depth);
+            newHeap.MakeHeap(new int[0], newHeapDepth);
+            
+            int iterationsCount = heaps.Max(heap => heap.lastPointer);
+            
+            IOrderedEnumerable<int> sortedElements = Enumerable.Range(0, iterationsCount)
+                .SelectMany(_ => heaps
+                    .Select(heap => heap.GetMax())
+                    .Where(element => element != -1))
+                .OrderByDescending(e => e);
 
-            for (int i = 0; i < totalCount; i++)
-            {
-                var firstElement = first.GetMax();
-                var secondElement = second.GetMax();
-
-                var firstForAdd = Math.Max(firstElement, secondElement);
-                var secondForAdd = Math.Min(firstElement, secondElement);
-
-                if (firstForAdd != -1)
-                    newHeap.Add(firstForAdd);
-
-                if (secondForAdd != -1)
-                    newHeap.Add(secondForAdd);
-            }
-
+            foreach (var element in sortedElements) 
+                newHeap.Add(element);
+        
             return newHeap;
         }
 

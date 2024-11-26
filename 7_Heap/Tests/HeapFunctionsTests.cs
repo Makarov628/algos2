@@ -102,7 +102,39 @@ namespace Tests
             }
             Assert.That(firstHeap.GetMax(), Is.EqualTo(-1));
             Assert.That(secondHeap.GetMax(), Is.EqualTo(-1));
+        }
 
+        [Test]
+        public void MergeThreeHeaps()
+        {
+            Heap firstHeap = new Heap()
+            {
+                HeapArray = new int[7] { 56, 25, 10, 17, 0, 0, 0 },
+                lastPointer = 4
+            };
+
+            Heap secondHeap = new Heap()
+            {
+                HeapArray = new int[7] { 35, 21, 26, 8, 12, 0, 0 },
+                lastPointer = 5
+            };
+
+            Heap thirdHeap = new Heap()
+            {
+                HeapArray = new int[7] { 41, 34, 20, 9, 11, 1, 0 },
+                lastPointer = 6
+            };
+
+            var newMergedHeap = HeapFunctions.MergeHeaps(firstHeap, secondHeap, thirdHeap);
+
+            var orderedList = new int[15] { 56, 41, 35, 34, 26, 25, 21, 20, 17, 12, 11, 10, 9, 8, 1 };
+            foreach (var item in orderedList)
+            {
+                Assert.That(newMergedHeap.GetMax(), Is.EqualTo(item));
+            }
+            Assert.That(firstHeap.GetMax(), Is.EqualTo(-1));
+            Assert.That(secondHeap.GetMax(), Is.EqualTo(-1));
+            Assert.That(thirdHeap.GetMax(), Is.EqualTo(-1));
         }
 
     }
