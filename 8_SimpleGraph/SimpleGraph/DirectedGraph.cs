@@ -7,6 +7,7 @@ namespace AlgorithmsDataStructures2
     public class DirectGraphVertex
     {
         public int Value;
+
         public DirectGraphVertex(int value)
         {
             Value = value;
@@ -28,23 +29,41 @@ namespace AlgorithmsDataStructures2
 
         public bool IsCyclic()
         {
-            for (int v = 0; v < max_vertex; v++)
-                if (vertex[v] != null && IsCyclicRecursive(v, new HashSet<int>()))
+            // Массив статусов вершин:
+            // 0 - не посещена (white)
+            // 1 - в процессе посещения (gray)
+            // 2 - посещена (black)
+            var state = new int[max_vertex];
+            
+            for (var v = 0; v < max_vertex; v++)
+            {
+                if (vertex[v] == null || state[v] != 0)
+                    continue;
+
+                if (IsCyclicRecursive(v, state))
                     return true;
+            }
 
             return false;
         }
 
-        private bool IsCyclicRecursive(int v, HashSet<int> visited)
+        private bool IsCyclicRecursive(int v, int[] state)
         {
-            if (visited.Contains(v))
-                return true;
+            state[v] = 1; // Начинаем посещение 
 
-            visited.Add(v);
-            foreach (var vToVisit in GetNeighbours(v))
-                if (IsCyclicRecursive(vToVisit, CloneVisitedCollection(visited)))
-                    return true;
+            foreach (var neighbor in GetNeighbours(v))
+            {
+                if (state[neighbor] == 1)
+                    return true; // Обнаружен цикл
 
+                if (state[neighbor] == 2)
+                    continue; // Игнорируем посещенные узлы
+
+                if (IsCyclicRecursive(neighbor, state))
+                    return true; // Если обнаружен цикл в поддереве, возвращаемся
+            }
+
+            state[v] = 2; // Заканчиваем посещение
             return false;
         }
 
@@ -53,14 +72,8 @@ namespace AlgorithmsDataStructures2
             for (int i = 0; i < max_vertex; i++)
                 if (m_adjacency[v, i] == 1)
                     yield return i;
-
-            yield break;
         }
-
-        private HashSet<int> CloneVisitedCollection(HashSet<int> fromCollection) =>
-            new HashSet<int>(fromCollection);
-             
-
+        
         public void AddVertex(int value)
         {
             for (int i = 0; i < max_vertex; i++)
@@ -80,11 +93,11 @@ namespace AlgorithmsDataStructures2
                 return;
 
             vertex[v] = null;
-            for (int i = 0; i < vertex.Length; i++)
+            for (var i = 0; i < vertex.Length; i++)
                 m_adjacency[v, i] = 0;
 
 
-            for (int j = 0; j < vertex.Length; j++)
+            for (var j = 0; j < vertex.Length; j++)
                 m_adjacency[j, v] = 0;
         }
 
@@ -104,6 +117,6 @@ namespace AlgorithmsDataStructures2
         }
 
         private bool IsIndexCorrect(int i) =>
-           i >= 0 && i < vertex.Length;
+            i >= 0 && i < vertex.Length;
     }
 }
