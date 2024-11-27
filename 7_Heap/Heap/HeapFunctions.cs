@@ -74,27 +74,37 @@ namespace AlgorithmsDataStructures2
 
         public static int FindElementLessThanKey(this Heap heap, int key)
         {
-            if (heap.HeapArray == null || heap.HeapArray.Length == 0 || heap.lastPointer == 0)
-                return -1;
+            return SearchLessThanKey(heap, key, 0, -1);
+        }
+        
+        private static int SearchLessThanKey(Heap heap, int searchKey, int parentIndex, int bestFound)
+        {
+            if (parentIndex >= heap.lastPointer)
+                return bestFound;
+            
+            var parent = heap.HeapArray[parentIndex];
+            
+            // Если узел меньше искомого и больше найденного - обновляем
+            if (bestFound < parent && parent < searchKey)
+                return parent;
 
-            var clonedHeap = new Heap()
-            {
-                HeapArray = new int[heap.HeapArray.Length],
-                lastPointer = heap.lastPointer
-            };
-            Array.Copy(heap.HeapArray, clonedHeap.HeapArray, heap.lastPointer);
-
-            while (clonedHeap.lastPointer > 0)
-            {
-                var element = clonedHeap.GetMax();
-                if (element < key)
-                    return element;
-            }
-
-            return -1;
+            // Если ключ больше чем текущий узел, проверяем дочерние узлы
+            bestFound = SearchLessThanKey(heap, searchKey, LeftChild(parentIndex), bestFound);
+            bestFound = SearchLessThanKey(heap, searchKey, RightChild(parentIndex), bestFound);
+            
+            return bestFound;
         }
 
-    
+        private static int LeftChild(int index)
+        {
+            return 2 * index + 1;
+        }
+
+        private static int RightChild(int index)
+        {
+            return 2 * index + 2;
+        }
+
         public static Heap MergeHeaps(params Heap[] heaps)
         {
             int elementsTotalCount = heaps.Sum(heap => heap.lastPointer);
@@ -102,7 +112,7 @@ namespace AlgorithmsDataStructures2
 
             var newHeap = new Heap();
             newHeap.MakeHeap(new int[0], newHeapDepth);
-            
+
             int iterationsCount = heaps.Max(heap => heap.lastPointer);
 
             IOrderedEnumerable<int> sortedElements = Enumerable.Range(0, iterationsCount)
@@ -111,9 +121,9 @@ namespace AlgorithmsDataStructures2
                     .Where(element => element != -1))
                 .OrderByDescending(e => e);
 
-            foreach (var element in sortedElements) 
+            foreach (var element in sortedElements)
                 newHeap.Add(element);
-        
+
             return newHeap;
         }
 

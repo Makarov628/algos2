@@ -87,6 +87,7 @@ namespace Tests
             Assert.That(heap.FindElementLessThanKey(1), Is.EqualTo(-1));
         }
 
+
         [Test]
         public void MergeHeaps()
         {
