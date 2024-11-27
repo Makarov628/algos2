@@ -7,19 +7,14 @@ namespace AlgorithmsDataStructures2
     {
         public static void Main(string[] args)
         {
-            Heap firstHeap = new Heap()
+            Heap heap = new Heap()
             {
-                HeapArray = new int[7] { 56, 25, 10, 17, 0, 0, 0 },
-                lastPointer = 4
+                /*                          0   1    2    3   4   5    6   7  8   9  10  11 12       */
+                HeapArray = new int[15] { 521, 409, 200, 300, 56, 84, 111, 1, 29, 8, 38, 4, 35, 0, 0 },
+                lastPointer = 13
             };
 
-            Heap secondHeap = new Heap()
-            {
-                HeapArray = new int[7] { 35, 21, 26, 8, 12, 0, 0 },
-                lastPointer = 5
-            };
-
-            var newMergedHeap = HeapFunctions.MergeHeaps(firstHeap, secondHeap);
+            heap.FindElementLessThanKey(300);
         }
     }
 }

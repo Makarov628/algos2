@@ -76,22 +76,27 @@ namespace AlgorithmsDataStructures2
         {
             return SearchLessThanKey(heap, key, 0, -1);
         }
-        
+
         private static int SearchLessThanKey(Heap heap, int searchKey, int parentIndex, int bestFound)
         {
             if (parentIndex >= heap.lastPointer)
                 return bestFound;
-            
+
             var parent = heap.HeapArray[parentIndex];
-            
-            // Если узел меньше искомого и больше найденного - обновляем
+            if (parent < bestFound)
+                return bestFound;
+
+            // // Если узел меньше искомого и больше найденного - обновляем
             if (bestFound < parent && parent < searchKey)
-                return parent;
+            {
+                bestFound = parent;
+                return bestFound;
+            }
 
             // Если ключ больше чем текущий узел, проверяем дочерние узлы
             bestFound = SearchLessThanKey(heap, searchKey, LeftChild(parentIndex), bestFound);
             bestFound = SearchLessThanKey(heap, searchKey, RightChild(parentIndex), bestFound);
-            
+
             return bestFound;
         }
 
