@@ -60,6 +60,17 @@ namespace AlgorithmsDataStructures2
         public static int CalculateDepth(uint index) =>
             (int)Math.Floor(Math.Log2(index + 1));
 
+        public static int FindMax(int[] array)
+        {
+            int newHeapDepth = (int)Math.Floor(Math.Log2(array.Length));
+            var heapForSort = new Heap();
+            heapForSort.MakeHeap(new int[0], newHeapDepth);
+
+            foreach (var value in array)
+                heapForSort.Add(value);
+
+            return heapForSort.GetMax();
+        }
 
         public static int FindElementLessThanKey(this Heap heap, int key)
         {
@@ -93,7 +104,7 @@ namespace AlgorithmsDataStructures2
             newHeap.MakeHeap(new int[0], newHeapDepth);
             
             int iterationsCount = heaps.Max(heap => heap.lastPointer);
-            
+
             IOrderedEnumerable<int> sortedElements = Enumerable.Range(0, iterationsCount)
                 .SelectMany(_ => heaps
                     .Select(heap => heap.GetMax())

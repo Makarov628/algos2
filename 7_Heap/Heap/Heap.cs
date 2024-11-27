@@ -101,7 +101,7 @@ namespace AlgorithmsDataStructures2
 
     private int GetTreeSizeByDepth(int depth)
     {
-      if (depth == 0)
+      if (depth <= 0)
         return 1;
 
       return (int)(Math.Pow(2, depth + 1) - 1);

@@ -53,6 +53,15 @@ namespace Tests
         }
 
         [Test]
+        public void FindMax()
+        {
+            Assert.That(HeapFunctions.FindMax(new int[] {}), Is.EqualTo(-1));
+            Assert.That(HeapFunctions.FindMax(new int[] { 6, 23, 123, 656, 36, 12, 12 }), Is.EqualTo(656));
+            Assert.That(HeapFunctions.FindMax(new int[] { 12, 12, 12, 12, 12, 12, 12, 12 }), Is.EqualTo(12));
+            Assert.That(HeapFunctions.FindMax(new int[] { 9, 8, 7, 6, 5, 4, 3, 2, 1 }), Is.EqualTo(9));
+        }
+
+        [Test]
         public void FindElementLessThanKey()
         {
             Heap heap = new Heap()
