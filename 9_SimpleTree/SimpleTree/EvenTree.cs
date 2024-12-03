@@ -143,37 +143,37 @@ namespace AlgorithmsDataStructures2
             if (Root == null)
                 return 0;
 
-            int evenSubtreesCount = 0;
-            var subtreesNodeAmount = new Dictionary<EvenTreeNode<T>, int>();
-
-            foreach (var (node, nodeCount) in GetNodesCountForEverySubtree(Root, subtreesNodeAmount))
-                if (nodeCount != 0 && nodeCount % 2 == 0)
-                    evenSubtreesCount += 1;
-            
-            return evenSubtreesCount;
+            var countEvenSubtrees = 0;
+            CountEvenSubtrees(Root, ref countEvenSubtrees);
+            return countEvenSubtrees;
         }
 
-        private Dictionary<EvenTreeNode<T>, int> GetNodesCountForEverySubtree(EvenTreeNode<T> subtreeRoot, Dictionary<EvenTreeNode<T>, int> subtreesNodeAmount) 
+
+        private int CountEvenSubtrees(EvenTreeNode<T> subtreeRoot, ref int countEvenSubtrees)
         {
-            subtreesNodeAmount[subtreeRoot] = 1;
+            var nodeCount = 1;
 
             if (subtreeRoot.IsLeaf())
-                return subtreesNodeAmount;
+                return nodeCount;
 
             foreach (var child in subtreeRoot.Children)
-                subtreesNodeAmount[subtreeRoot] += GetNodesCountForEverySubtree(child, subtreesNodeAmount)[child];
+                nodeCount += CountEvenSubtrees(child, ref countEvenSubtrees);
 
-            return subtreesNodeAmount;
+            if (nodeCount % 2 == 0)
+                countEvenSubtrees += 1;
+            
+            return nodeCount;
         }
 
         private void GetNodes(EvenTreeNode<T> node, List<EvenTreeNode<T>> nodes)
         {
             nodes.Add(node);
-            if (node.Children != null)
-            {
-                foreach (var child in node.Children)
-                    GetNodes(child, nodes);
-            }
+
+            if (node.IsLeaf())
+                return;
+
+            foreach (var child in node.Children)
+                GetNodes(child, nodes);
         }
 
         private void GetNodesByValue(EvenTreeNode<T> node, T value, List<EvenTreeNode<T>> nodes)
@@ -181,11 +181,11 @@ namespace AlgorithmsDataStructures2
             if (node.NodeValue.CompareTo(value) == 0)
                 nodes.Add(node);
 
-            if (node.Children != null)
-            {
-                foreach (var child in node.Children)
-                    GetNodesByValue(child, value, nodes);
-            }
+            if (node.IsLeaf())
+                return;
+
+            foreach (var child in node.Children)
+                GetNodesByValue(child, value, nodes);
         }
 
         private void DeleteNodeFromParent(EvenTreeNode<T> node)
@@ -230,7 +230,7 @@ namespace AlgorithmsDataStructures2
             var list = new List<EvenTreeNode<T>>();
             list.Add(currentNode);
 
-            if (currentNode.Children == null || currentNode.Children.Count == 0)
+            if (currentNode.IsLeaf())
                 return list;
 
             foreach (var child in currentNode.Children)
@@ -248,7 +248,7 @@ namespace AlgorithmsDataStructures2
 
             list.Add(currentNode);
 
-            if (currentNode.Children == null || currentNode.Children.Count == 0)
+            if (currentNode.IsLeaf())
                 return list;
 
             foreach (var child in currentNode.Children)

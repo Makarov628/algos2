@@ -42,15 +42,55 @@ namespace Tests
         {
             int count = tree.CountEvenSubtrees();
             Assert.That(count, Is.EqualTo(3));
+                  
+            /*
+                   1 
+                /  |  \
+               2   3   6
+              / \  |    \
+             5  7  4     8
+                        / \
+                       9  10
+            */
         }
 
         [Test]
         public void TestBinaryEven()
         {
-            // Удаляем узел с NodeValue == 3 (tree.Root.Children[1])
+            /*
+                   1
+                /  |  \
+               2   3   6
+              / \  |    \
+             5  7  4     8
+                        / \
+                       9  10
+            */
+
+            // Удаляем узел с NodeValue == 3 
             tree.DeleteNode(tree.Root.Children[1]);
 
+            /*
+                   1
+                 /   \
+                2     6
+               / \     \
+              5   7     8
+                       / \
+                      9  10
+            */
+
             tree.BalanceBinaryEven();
+
+            /*
+                       7
+                     /   \
+                    5     9
+                   / \   / \
+                  2  6  8  10
+                 /
+                1
+            */
 
             Assert.That(tree.Root.NodeValue, Is.EqualTo(7));
 
@@ -70,6 +110,62 @@ namespace Tests
 
             Assert.That(tree.Root.Children[1].Children[1].NodeValue, Is.EqualTo(10));
             Assert.That(tree.Root.Children[1].Children[1].Children, Is.Null.Or.Empty);
+        }
+
+        [Test]
+        public void TestBinaryEven_WithoutDeleteNode()
+        {
+
+            /*
+                   1
+                /  |  \
+               2   3   6
+              / \  |    \
+             5  7  4     8
+                        / \
+                       9  10
+            */
+
+            tree.BalanceBinaryEven();
+
+            /*
+                     6
+                  /     \
+                 3       9
+                / \     / \
+               2   5   8   10
+              /   /   /
+             1   4   7
+                   
+            */
+
+            Assert.That(tree.Root.NodeValue, Is.EqualTo(6));
+            Assert.That(tree.Root.Children.Count, Is.EqualTo(2));
+
+            var leftChild = tree.Root.Children[0];
+            var rightChild = tree.Root.Children[1];
+
+            Assert.That(leftChild.NodeValue, Is.EqualTo(3));
+            Assert.That(rightChild.NodeValue, Is.EqualTo(9));
+
+            Assert.That(leftChild.Children.Count, Is.EqualTo(2));
+            Assert.That(rightChild.Children.Count, Is.EqualTo(2));
+
+            Assert.That(leftChild.Children[0].NodeValue, Is.EqualTo(2));
+            Assert.That(leftChild.Children[1].NodeValue, Is.EqualTo(5));
+
+            Assert.That(rightChild.Children[0].NodeValue, Is.EqualTo(8));
+            Assert.That(rightChild.Children[1].NodeValue, Is.EqualTo(10));
+
+            Assert.That(leftChild.Children[0].Children.Count, Is.EqualTo(1));
+            Assert.That(leftChild.Children[0].Children[0].NodeValue, Is.EqualTo(1));
+            
+            Assert.That(leftChild.Children[1].Children.Count, Is.EqualTo(1));
+            Assert.That(leftChild.Children[1].Children[0].NodeValue, Is.EqualTo(4));
+
+            Assert.That(rightChild.Children[0].Children.Count, Is.EqualTo(1));
+            Assert.That(rightChild.Children[0].Children[0].NodeValue, Is.EqualTo(7));
+
         }
     }
 }
