@@ -367,5 +367,51 @@ namespace AlgorithmsDataStructures2
 
         private bool IsIndexCorrect(int i) =>
             i >= 0 && i < vertex.Length;
+
+        
+        public bool IsConnected()
+        {
+            // Очищаем пометки посещения
+            foreach (var v in vertex)
+            {
+                if (v != null)
+                    v.Hit = false;
+            }
+
+            int startIndex = -1;
+            for (int i = 0; i < vertex.Length; i++)
+            {
+                if (vertex[i] != null)
+                {
+                    startIndex = i;
+                    break;
+                }
+            }
+
+            if (startIndex == -1)
+                return true;
+
+            DFSConnected(startIndex);
+
+            foreach (var v in vertex)
+            {
+                if (v != null && !v.Hit)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private void DFSConnected(int v)
+        {
+            vertex[v].Hit = true;
+            for (int i = 0; i < max_vertex; i++)
+            {
+                if (m_adjacency[v, i] != 0 && !vertex[i].Hit)
+                {
+                    DFSConnected(i);
+                }
+            }
+        }
     }
 }
