@@ -876,7 +876,7 @@ namespace AlgorithmDataStructures2Tests
             Assert.That(tree.FindMaxDistanceInTree(), Is.EqualTo(5));
         }
     
-                [Test]
+        [Test]
         public void TestFindAllCycles()
         {
             var graph = new SimpleGraph<int>(6);
