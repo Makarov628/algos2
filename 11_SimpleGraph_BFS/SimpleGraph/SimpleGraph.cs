@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AlgorithmsDataStructures2
 {
@@ -302,5 +303,124 @@ namespace AlgorithmsDataStructures2
 
         private bool IsIndexCorrect(int i) =>
             i >= 0 && i < vertex.Length;
+
+        private void UnhitAllVertices()
+        {
+            foreach (var v in vertex)
+            {
+                if (v != null)
+                    v.Hit = false;
+            }
+        }
+
+        public int FindMaxDistanceInTree()
+        {
+            int start = -1;
+            for (int i = 0; i < max_vertex; i++)
+            {
+                if (vertex[i] != null)
+                {
+                    start = i;
+                    break;
+                }
+            }
+
+            if (start == -1) return 0;
+
+            // Находим самую удалённую вершину от start
+            var (farthestNode, _) = BFSFarthestNode(start);
+            // Находим самую удалённую вершину от farthestNode
+            var (_, maxDistance) = BFSFarthestNode(farthestNode);
+
+            return maxDistance;
+        }
+
+        private (int node, int dist) BFSFarthestNode(int start)
+        {
+            UnhitAllVertices();
+            var dist = Enumerable.Repeat(-1, max_vertex).ToArray();
+            var queue = new Queue<int>();
+
+            dist[start] = 0;
+            vertex[start].Hit = true;
+            queue.Enqueue(start);
+
+            int farthestNode = start;
+            int maxDist = 0;
+
+            while (queue.Count > 0)
+            {
+                int current = queue.Dequeue();
+                for (int i = 0; i < max_vertex; i++)
+                {
+                    if (m_adjacency[current, i] != 1 || vertex[i] == null || vertex[i].Hit)
+                        continue;
+
+                    vertex[i].Hit = true;
+                    dist[i] = dist[current] + 1;
+                    if (dist[i] > maxDist)
+                    {
+                        maxDist = dist[i];
+                        farthestNode = i;
+                    }
+                    queue.Enqueue(i);
+                }
+            }
+
+            return (farthestNode, maxDist);
+        }
+
+        private bool IsGraphEmpty() => vertex.All(v => v == null);
+
+        public List<List<int>> FindAllCycles()
+        {
+            if (IsGraphEmpty())
+                return new List<List<int>>();
+
+            var all_cycles = new List<List<int>>();
+            for (int i = 0; i < vertex.Length; i++)
+            {
+                if (vertex[i] == null)
+                    continue;
+
+                var queue = new Queue<(int nodeIndex, List<int> path)>();
+                queue.Enqueue((i, new List<int> { i }));
+
+                var cyclesFromNode = FindAllCyclesFromNode(i, queue);
+                if (cyclesFromNode.Any())
+                    all_cycles.AddRange(cyclesFromNode);
+            }
+
+            return all_cycles;
+        }
+
+        private List<List<int>> FindAllCyclesFromNode(int start_index, Queue<(int nodeIndex, List<int> path)> queue)
+        {
+            var cycles = new List<List<int>>();
+
+            while (queue.Count > 0)
+            {
+                var (currentNodeIndex, currentPath) = queue.Dequeue();
+
+                for (int i = 0; i < max_vertex; i++)
+                {
+                    int relation = m_adjacency[currentNodeIndex, i];
+                    if (relation == 1 && i == start_index && currentPath.Count > 2)
+                    {
+                        var newCycle = new List<int>(currentPath);
+                        newCycle.Add(start_index);
+                        cycles.Add(newCycle);
+                    }
+
+                    if (relation == 1 && !currentPath.Contains(i))
+                    {
+                        var newPath = new List<int>(currentPath) { i };
+                        queue.Enqueue((i, newPath));
+                    }
+                }
+            }
+
+            return cycles;
+        }
     }
 }
