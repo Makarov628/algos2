@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AlgorithmsDataStructures2
 {
@@ -13,11 +15,11 @@ namespace AlgorithmsDataStructures2
             Hit = false;
         }
     }
-  
+
     public class SimpleGraph<T>
     {
-        public Vertex<T> [] vertex; // список, хранящий вершины
-        public int [,] m_adjacency; // матрица смежности
+        public Vertex<T>[] vertex; // список, хранящий вершины
+        public int[,] m_adjacency; // матрица смежности
         public int max_vertex;
         private Stack<Vertex<T>> _stack;
         private Queue<Vertex<T>> _queue;
@@ -27,13 +29,13 @@ namespace AlgorithmsDataStructures2
         public SimpleGraph(int size)
         {
             max_vertex = size;
-            m_adjacency = new int [size,size];
-            vertex = new Vertex<T> [size];
+            m_adjacency = new int[size, size];
+            vertex = new Vertex<T>[size];
             _stack = new Stack<Vertex<T>>();
             _queue = new Queue<Vertex<T>>();
             _pathes = new List<List<Vertex<T>>>();
         }
-	
+
         public void AddVertex(T value)
         {
             // код добавления новой вершины 
@@ -44,7 +46,7 @@ namespace AlgorithmsDataStructures2
             {
                 if (vertex[i] != null)
                     continue;
-                
+
                 var newVertex = new Vertex<T>(value);
                 vertex[i] = newVertex;
                 break;
@@ -64,19 +66,19 @@ namespace AlgorithmsDataStructures2
             {
                 m_adjacency[v, i] = 0;
             }
-            
+
             for (int j = 0; j < vertex.Length; j++)
             {
                 m_adjacency[j, v] = 0;
             }
         }
-	
+
         public bool IsEdge(int v1, int v2)
         {
             // true если есть ребро между вершинами v1 и v2
             return IsIndexCorrect(v1) && IsIndexCorrect(v2) && m_adjacency[v1, v2] == 1;
         }
-	
+
         public void AddEdge(int v1, int v2)
         {
             // добавление ребра между вершинами v1 и v2
@@ -86,30 +88,30 @@ namespace AlgorithmsDataStructures2
             m_adjacency[v1, v2] = 1;
             m_adjacency[v2, v1] = 1;
         }
-	
+
         public void RemoveEdge(int v1, int v2)
         {
             // удаление ребра между вершинами v1 и v2
             if (!IsIndexCorrect(v1) || !IsIndexCorrect(v2))
                 return;
-            
+
             m_adjacency[v1, v2] = 0;
             m_adjacency[v2, v1] = 0;
         }
-        
+
         public List<Vertex<T>> DepthFirstSearch(int VFrom, int VTo)
         {
             // Узлы задаются позициями в списке vertex.
             // Возвращается список узлов -- путь из VFrom в VTo.
             // Список пустой, если пути нету.
-            
+
             var path = new List<Vertex<T>>();
             if (!IsIndexCorrect(VFrom) || !IsIndexCorrect(VTo))
                 return path;
-            
+
             // 0. Prepare for search
             ClearDataStructures();
-            
+
             // 1. Выбираем текущую вершину
             var res = GetPathDepth(VFrom, VTo);
             Array.Reverse(res);
@@ -121,7 +123,7 @@ namespace AlgorithmsDataStructures2
 
             return path;
         }
-        
+
         public List<Vertex<T>> BreadthFirstSearch(int VFrom, int VTo)
         {
             // узлы задаются позициями в списке vertex.
@@ -130,7 +132,7 @@ namespace AlgorithmsDataStructures2
             var path = new List<Vertex<T>>();
             if (!IsIndexCorrect(VFrom) || !IsIndexCorrect(VTo))
                 return path;
-            
+
             ClearDataStructures();
 
             vertex[VFrom].Hit = true;
@@ -140,7 +142,7 @@ namespace AlgorithmsDataStructures2
 
             return CalculatePath(VFrom, VTo);
         }
-        
+
         public List<Vertex<T>> WeakVertices()
         {
             // возвращает список узлов вне треугольников
@@ -175,13 +177,15 @@ namespace AlgorithmsDataStructures2
             return true;
         }
 
+
+
         private List<Vertex<T>> GetNeighbours(Vertex<T> current)
         {
             var list = new List<Vertex<T>>();
             var currentIndex = Array.IndexOf(vertex, current);
             if (currentIndex == -1)
                 return list;
-            
+
             for (int i = 0; i < max_vertex; i++)
             {
                 if (i != currentIndex && m_adjacency[currentIndex, i] == 1)
@@ -228,7 +232,7 @@ namespace AlgorithmsDataStructures2
         private bool GetPathWidth(int X, int VTo)
         {
             bool initial = true;
-            
+
             while (_operationLimit > 0)
             {
                 // 2) Из всех смежных с X вершин выбираем любую (например первую) непосещённую Y
@@ -249,12 +253,12 @@ namespace AlgorithmsDataStructures2
                     AddToPathOrCreateNew(vertex[X], vertex[Y], initial);
                     continue;
                 }
-                
+
                 //Если таких вершин нет, проверяем очередь:
                 // Если очередь пуста, заканчиваем работу (путь до цели не найден).
                 if (_queue.Count == 0)
                     return false;
-                
+
                 // извлекаем из очереди очередной элемент, делаем его текущим X, и переходим обратно к данному п.2.
                 var nextToCheck = _queue.Dequeue();
                 X = Array.IndexOf(vertex, nextToCheck);
@@ -269,7 +273,7 @@ namespace AlgorithmsDataStructures2
         {
             if (initial)
             {
-                _pathes.Add(new List<Vertex<T>>() {x, y});
+                _pathes.Add(new List<Vertex<T>>() { x, y });
                 return;
             }
 
@@ -277,14 +281,14 @@ namespace AlgorithmsDataStructures2
             foreach (var path in _pathes)
             {
                 var index = path.IndexOf(x);
-                
+
                 // если элемент - последний, добавляем в текущий путь
                 if (index == path.Count - 1)
                 {
                     path.Add(y);
                     return;
                 }
-                
+
                 // если элемент есть, но он не последний, значит пути в данном месте расходятся (уже был добавлен элемент в нужный путь)
                 // поэтому нужно добавить новый путь в список путей
                 if (index != -1)
@@ -323,7 +327,7 @@ namespace AlgorithmsDataStructures2
                 X = GetNotVisited(X);
                 if (X != -1)
                     return GetPathDepth(X, VTo);
-            
+
                 _stack.Pop();
                 if (_stack.Count == 0)
                     break;
@@ -332,7 +336,7 @@ namespace AlgorithmsDataStructures2
                 newCurrent.Hit = true;
                 X = Array.IndexOf(vertex, newCurrent);
             }
-            
+
             return _stack.ToArray(); // возвращаем пустой
         }
 
@@ -368,92 +372,201 @@ namespace AlgorithmsDataStructures2
         private bool IsIndexCorrect(int i) =>
             i >= 0 && i < vertex.Length;
 
-        
-        public bool IsConnected()
+
+        private IEnumerable<int> GetVerticles() =>
+            Enumerable.Range(0, max_vertex).Where(v => vertex[v] != null);
+
+        private IEnumerable<int> GetNeighbours(int v) =>
+            GetVerticles()
+                .Where(vi => vi != v && IsEdge(v, vi));
+
+        private IEnumerable<int> GetNeighboursIfStrong(int v)
         {
-            // Очищаем пометки посещения
-            foreach (var v in vertex)
+            var neighbours = GetNeighbours(v).ToArray();
+            if (neighbours.Length >= 2)
+                return neighbours;
+
+            return Array.Empty<int>();
+        }
+
+        private bool IsTriangle(int v1, int v2, int v3) =>
+            IsEdge(v1, v2) && IsEdge(v2, v3) && IsEdge(v3, v1);
+
+        public int CountTriangles()
+        {
+            var trianglePaths = new HashSet<string>();
+
+            foreach (var v1 in GetVerticles())
+                foreach (var v2 in GetNeighboursIfStrong(v1))
+                    foreach (var v3 in GetNeighbours(v2))
+                        if (IsTriangle(v1, v2, v3))
+                            trianglePaths.Add(string.Join("-", new[] { v1, v2, v3 }.OrderBy(x => x)));
+
+            return trianglePaths.Count;
+        }
+
+        public List<Vertex<T>> WeakVerticesStrassen()
+        {
+            // 1. Получаем A2 = A * A
+            int n = max_vertex;
+            int[,] A = m_adjacency;
+            int[,] A2 = StrassenMultiply(A, A, n);
+
+            // 2. Получаем A3 = A2 * A
+            int[,] A3 = StrassenMultiply(A2, A, n);
+
+            // 3. Проверяем диагональ A3. Если A3[i,i] == 0, вершина i слабая.
+            var result = new List<Vertex<T>>();
+            for (int i = 0; i < n; i++)
             {
-                if (v != null)
-                    v.Hit = false;
+                if (vertex[i] != null && A3[i, i] == 0)
+                    result.Add(vertex[i]);
             }
 
-            int startIndex = -1;
-            for (int i = 0; i < vertex.Length; i++)
+            return result;
+        }
+
+        // Предполагаем, что n - степень двойки.
+        // Если не степень двойки, нужно дополнять матрицу до нужного размера.
+        private int[,] StrassenMultiply(int[,] A, int[,] B, int n)
+        {
+            // если n=1, просто умножаем скалярно
+            if (n == 1)
             {
-                if (vertex[i] != null)
-                {
-                    startIndex = i;
-                    break;
-                }
+                int[,] C = new int[1, 1];
+                C[0, 0] = A[0, 0] * B[0, 0];
+                return C;
             }
 
-            if (startIndex == -1)
+            int newSize = n / 2;
+
+            // Разбиваем матрицу на 4 подматрицы
+            int[,] A11 = new int[newSize, newSize];
+            int[,] A12 = new int[newSize, newSize];
+            int[,] A21 = new int[newSize, newSize];
+            int[,] A22 = new int[newSize, newSize];
+
+            int[,] B11 = new int[newSize, newSize];
+            int[,] B12 = new int[newSize, newSize];
+            int[,] B21 = new int[newSize, newSize];
+            int[,] B22 = new int[newSize, newSize];
+
+            Split(A, A11, 0 , 0);
+            Split(A, A12, 0 , newSize);
+            Split(A, A21, newSize, 0);
+            Split(A, A22, newSize, newSize);
+
+            Split(B, B11, 0 , 0);
+            Split(B, B12, 0 , newSize);
+            Split(B, B21, newSize, 0);
+            Split(B, B22, newSize, newSize);
+
+            // Вычисляем 7 произведений по Штрассену:
+            var M1 = StrassenMultiply(Add(A11, A22, newSize), Add(B11, B22, newSize), newSize);
+            var M2 = StrassenMultiply(Add(A21, A22, newSize), B11, newSize);
+            var M3 = StrassenMultiply(A11, Sub(B12, B22, newSize), newSize);
+            var M4 = StrassenMultiply(A22, Sub(B21, B11, newSize), newSize);
+            var M5 = StrassenMultiply(Add(A11, A12, newSize), B22, newSize);
+            var M6 = StrassenMultiply(Sub(A21, A11, newSize), Add(B11, B12, newSize), newSize);
+            var M7 = StrassenMultiply(Sub(A12, A22, newSize), Add(B21, B22, newSize), newSize);
+
+            // C11, C12, C21, C22
+            var C11 = Add(Sub(Add(M1, M4, newSize), M5, newSize), M7, newSize);
+            var C12 = Add(M3, M5, newSize);
+            var C21 = Add(M2, M4, newSize);
+            var C22 = Add(Sub(Add(M1, M3, newSize), M2, newSize), M6, newSize);
+
+            int[,] Cn = new int[n,n];
+            Join(C11, Cn, 0 , 0);
+            Join(C12, Cn, 0 , newSize);
+            Join(C21, Cn, newSize, 0);
+            Join(C22, Cn, newSize, newSize);
+
+            return Cn;
+        }
+
+        private void Split(int[,] P, int[,] C, int iB, int jB) 
+        {
+            for (int i = 0; i < C.GetLength(0); i++)
+                for (int j = 0; j < C.GetLength(1); j++)
+                    C[i,j] = P[iB + i, jB + j];
+        }
+
+        private void Join(int[,] C, int[,] P, int iB, int jB)
+        {
+            for (int i = 0; i < C.GetLength(0); i++)
+                for (int j = 0; j < C.GetLength(1); j++)
+                    P[iB + i, jB + j] = C[i,j];
+        }
+
+        private int[,] Add(int[,] A, int[,] B, int n)
+        {
+            int[,] R = new int[n,n];
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++)
+                    R[i,j] = A[i,j] + B[i,j];
+            return R;
+        }
+
+        private int[,] Sub(int[,] A, int[,] B, int n)
+        {
+            int[,] R = new int[n,n];
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++)
+                    R[i,j] = A[i,j] - B[i,j];
+            return R;
+        }
+    }
+
+    public static class GraphHelper
+    {
+        public static List<Vertex<T>> WeakVerticles<T>(SimpleGraph<T> graph)
+        {
+            var weakVerticles = new List<Vertex<T>>();
+
+            for (int v = 0; v < graph.max_vertex; v++)
+            {
+                if (IsWeak(graph, v))
+                    weakVerticles.Add(graph.vertex[v]);
+            }
+
+            return weakVerticles;
+        }
+
+        private static bool IsWeak<T>(SimpleGraph<T> graph, int vertexIndex)
+        {
+            var neighbours = GetNeighbours(graph, vertexIndex);
+
+            if (neighbours.Count < 2)
                 return true;
 
-            DFSConnected(startIndex);
-
-            foreach (var v in vertex)
-            {
-                if (v != null && !v.Hit)
+            foreach (var n in neighbours)
+                if (HaveLink(graph, neighbours, n))
                     return false;
-            }
 
             return true;
         }
 
-        private void DFSConnected(int v)
+
+        private static List<int> GetNeighbours<T>(SimpleGraph<T> graph, int vertexIndex)
         {
-            vertex[v].Hit = true;
-            for (int i = 0; i < max_vertex; i++)
-            {
-                if (m_adjacency[v, i] != 0 && !vertex[i].Hit)
-                {
-                    DFSConnected(i);
-                }
-            }
+            var neighbours = new List<int>();
+
+            for (int i = 0; i < graph.max_vertex; i++)
+                if (i != vertexIndex && graph.IsEdge(vertexIndex, i))
+                    neighbours.Add(i);
+
+            return neighbours;
         }
 
-        // // Метод для поиска длины самого длинного простого пути в ориентированном графе
-        // public int LongestSimplePathLength()
-        // {
-        //     if (!_isDirected)
-        //         throw new InvalidOperationException("Метод применим только к ориентированным графам.");
+        private static bool HaveLink<T>(SimpleGraph<T> graph, List<int> neighbours, int neighbourIndex)
+        {
+            for (int i = 0; i < graph.max_vertex; i++)
+                // если текущий имеет ребро и neighbours содержит этот узел - значит треугольник есть
+                if (i != neighbourIndex && graph.IsEdge(neighbourIndex, i) && neighbours.Contains(i))
+                    return true;
 
-        //     int maxPathLength = 0;
-
-        //     for (int i = 0; i < max_vertex; i++)
-        //     {
-        //         if (vertex[i] != null)
-        //         {
-        //             bool[] visited = new bool[max_vertex];
-        //             int pathLength = DFSLongestPath(i, visited, 0);
-        //             if (pathLength > maxPathLength)
-        //                 maxPathLength = pathLength;
-        //         }
-        //     }
-
-        //     return maxPathLength;
-        // }
-
-        // private int DFSLongestPath(int v, bool[] visited, int currentLength)
-        // {
-        //     visited[v] = true;
-        //     int maxLength = currentLength;
-
-        //     for (int i = 0; i < max_vertex; i++)
-        //     {
-        //         if (m_adjacency[v, i] == 1 && !visited[i])
-        //         {
-        //             int length = DFSLongestPath(i, visited, currentLength + 1);
-        //             if (length > maxLength)
-        //                 maxLength = length;
-        //         }
-        //     }
-
-        //     visited[v] = false; // Возврат к предыдущей вершине (backtrack)
-
-        //     return maxLength;
-        // }
+            return false;
+        }
     }
 }
