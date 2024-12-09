@@ -328,7 +328,8 @@ namespace AlgorithmsDataStructures2
             if (start == -1) return 0;
 
             // Находим самую удалённую вершину от start
-            var (_, maxDistance) = BFSFarthestNode(start);
+            var (farthestNode, _) = BFSFarthestNode(start);
+            var (_, maxDistance) = BFSFarthestNode(farthestNode);
  
             return maxDistance;
         }
